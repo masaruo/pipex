@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/14 22:56:00 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/04/15 20:19:57 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,68 +29,54 @@ char	*ft_get_path(char *cmd)
 		return (ft_strjoin("/usr/bin/", cmd));
 }
 
-void	ft_exec_cmd(char *cmd)
-{
-	extern char	**environ;
-	char		**argv;
+// void	ft_exec_cmd(char *cmd1, char *cmd2)
+// {
+// 	pid_t		pid;
+// 	size_t		status;
+// 	extern char	**environ;
+// 	char		**argv;
 
-	argv = ft_split(cmd, ' ');
-	execve(ft_get_path(argv[0]), argv, environ);
-	// error handle
-	perror("execve");
-	exit(1);
-}
-
-int	ft_open(const char *path, int flags, int mode)
-{
-	int	fd;
-
-	if (!mode)
-		fd = open(path, flags);
-	else
-		fd = open(path, flags, mode);
-	return (fd);
-}
+// 	pid = fork();
+// 	if (pid < 0)
+// 	{
+// 		//! error handle
+// 		exit(1);
+// 	}
+// 	if (pid == 0)
+// 	{
+// 		argv = ft_split(cmd1, ' ');
+// 		execve(ft_get_path(argv[0]), argv, environ);
+// 		perror(argv[1]);
+// 		exit(99);
+// 	}
+// 	else
+// 	{
+// 		argv = ft_split(cmd2, ' ');
+		
+// 	}
+// }
 
 void	ft_pipex(char *infile, char *cmd1, char *cmd2, char *outfile)
 {
-	pid_t		pid;
-	size_t		status;
 	char 		**argv;
 	int			fd_infile;
 	int			fd_outfile;
 	int			n;
 	int			n_pipe;
-	int			fds[2];
+	int			p_fds[2];
 
-	fd_infile = ft_open(infile, O_RDONLY, false);
-	fd_outfile = ft_open(outfile, O_WRONLY, O_CREAT);
+	fd_infile = open(infile, O_RDONLY);
+	fd_outfile = open(outfile, O_WRONLY | O_CREAT | O_TRUNC);// mode - unmask to get persmission right
 	n = dup2(fd_infile, STDIN_FILENO);
 	ft_exec_cmd(cmd1);
-	n_pipe = pipe(fds);
-	pid = fork();
-	if (pid < 0)
-	{
-		// todo error
-	}
-	if (pid == 0)
-	{
+	// pipe(p_fds);
+	//パイプ
+	// パイプの後半
+	// ft_exec_cmd(cmd2);
+	// n = dup2(STDOUT_FILENO, fd_outfile);
 	close(fds[1]);
-	n = dup2(STDOUT_FILENO, fd_outfile);
-	ft_exec_cmd(cmd2);
-	//! write? get_next_line?
 	close(fd_outfile);
-	}
-	else
-	{
-		printf("parent process\n");
-		close(fds[0]);
-		waitpid(pid, &status, 0);
-		if (WIFEXITED(status))
-		{
-			
-		}
-	}
+	close(fds[0]);
 }
 
 int	main(int argc, char **argv)
