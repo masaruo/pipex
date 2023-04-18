@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/18 16:23:52 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/04/18 18:00:07 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,6 @@ void	ft_exec_cmd(char *cmd1, char *cmd2, int fd_out)
 		// printf("%s", cmd2);
 		close(pipe_fd[1]);
 		wait(&status);
-		printf("%d:status\n", status);
 		printf("parent!\n");
 		dup2(pipe_fd[0], STDIN_FILENO);
 		close(pipe_fd[0]);
