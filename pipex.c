@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/15 20:19:57 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/04/18 16:23:52 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,54 +29,61 @@ char	*ft_get_path(char *cmd)
 		return (ft_strjoin("/usr/bin/", cmd));
 }
 
-// void	ft_exec_cmd(char *cmd1, char *cmd2)
-// {
-// 	pid_t		pid;
-// 	size_t		status;
-// 	extern char	**environ;
-// 	char		**argv;
+void	ft_exec_cmd(char *cmd1, char *cmd2, int fd_out)
+{
+	pid_t		pid;
+	int			status;
+	extern char	**environ;
+	char		**argv;
+	int			pipe_fd[2];
 
-// 	pid = fork();
-// 	if (pid < 0)
-// 	{
-// 		//! error handle
-// 		exit(1);
-// 	}
-// 	if (pid == 0)
-// 	{
-// 		argv = ft_split(cmd1, ' ');
-// 		execve(ft_get_path(argv[0]), argv, environ);
-// 		perror(argv[1]);
-// 		exit(99);
-// 	}
-// 	else
-// 	{
-// 		argv = ft_split(cmd2, ' ');
-		
-// 	}
-// }
+	pipe(pipe_fd);
+	pid = fork();
+	if (pid < 0)
+	{
+		//todo error handle
+		exit(1);
+	}
+	if (pid == 0)
+	{
+		printf("child!\n");
+		close(pipe_fd[0]);
+		dup2(pipe_fd[1], STDOUT_FILENO);
+		close(pipe_fd[1]);
+		argv = ft_split(cmd1, ' ');
+		execve(ft_get_path(argv[0]), argv, environ);
+		perror(argv[1]);
+		exit(99);
+	}
+	else
+	{
+		// printf("%s", cmd2);
+		close(pipe_fd[1]);
+		wait(&status);
+		printf("%d:status\n", status);
+		printf("parent!\n");
+		dup2(pipe_fd[0], STDIN_FILENO);
+		close(pipe_fd[0]);
+		dup2(fd_out, STDOUT_FILENO);
+		close(fd_out);
+		argv = ft_split(cmd2, ' ');
+		execve(ft_get_path(argv[0]), argv, environ);
+		perror(argv[1]);
+		exit(0);
+	}
+}
 
 void	ft_pipex(char *infile, char *cmd1, char *cmd2, char *outfile)
 {
-	char 		**argv;
-	int			fd_infile;
-	int			fd_outfile;
-	int			n;
-	int			n_pipe;
-	int			p_fds[2];
+	int	fd_in;
+	int	fd_out;
 
-	fd_infile = open(infile, O_RDONLY);
-	fd_outfile = open(outfile, O_WRONLY | O_CREAT | O_TRUNC);// mode - unmask to get persmission right
-	n = dup2(fd_infile, STDIN_FILENO);
-	ft_exec_cmd(cmd1);
-	// pipe(p_fds);
-	//パイプ
-	// パイプの後半
-	// ft_exec_cmd(cmd2);
-	// n = dup2(STDOUT_FILENO, fd_outfile);
-	close(fds[1]);
-	close(fd_outfile);
-	close(fds[0]);
+	fd_in = open(infile, O_RDONLY);
+	// fd_out = open(outfile, O_RDONLY | O_CREAT, S_IRWXU);// mode - unmask to get persmission right
+	fd_out = open(outfile, O_RDWR);// mode - unmask to get persmission right
+	dup2(fd_in, STDIN_FILENO);
+	close(fd_in);
+	ft_exec_cmd(cmd1, cmd2, fd_out);
 }
 
 int	main(int argc, char **argv)
