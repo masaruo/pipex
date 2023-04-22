@@ -6,14 +6,12 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/20 22:23:37 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/04/22 21:24:15 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include "pipex.h"
-
-// https://www.geeksforgeeks.org/exec-family-of-functions-in-c/
 
 char	*ft_get_path(char *cmd)
 {
@@ -109,73 +107,82 @@ char	*ft_get_path(char *cmd)
 // 	ft_exec_cmd(cmd1, cmd2, fd_out);
 // }
 
-void	ft_first(char *infile, char *cmd, int *pipe)
-{
-	char		**argv;
-	extern char	**environ;
-	pid_t		pid;
+// void	ft_first(char *infile, char *cmd, int *pipe)
+// {
+// 	char		**argv;
+// 	extern char	**environ;
+// 	pid_t		pid;
 
-	pid = fork();
-	if (pid == 0)
-	{
-		close(pipe[0]);
-		dup2(infile, STDIN_FILENO);
-		close(infile);
-		dup2(pipe[1], STDOUT_FILENO);
-		close(pipe[1]);
-		argv = ft_split(cmd, ' ');
-		execve(ft_get_path(argv[0]), argv, environ);
-		perror(cmd);
-		exit(99);
-	}
-}
+// 	pid = fork();
+// 	if (pid == 0)
+// 	{
+// 		close(pipe[0]);
+// 		dup2(infile, STDIN_FILENO);
+// 		close(infile);
+// 		dup2(pipe[1], STDOUT_FILENO);
+// 		close(pipe[1]);
+// 		argv = ft_split(cmd, ' ');
+// 		execve(ft_get_path(argv[0]), argv, environ);
+// 		perror(cmd);
+// 		exit(99);
+// 	}
+// }
 
-void	ft_middle(char *cmd, int *pipe)
-{
-	char		**argv;
-	extern char	**environ;
-	pid_t		pid;
+// void	ft_middle(char *cmd, int *pipe)
+// {
+// 	char		**argv;
+// 	extern char	**environ;
+// 	pid_t		pid;
 
-	pid = fork();
-	if (pid == 0)
-	{
-		dup2(pipe[0], STDIN_FILENO);
-		close(pipe[0]);
-		dup2(pipe[1], STDOUT_FILENO);
-		close(pipe[1]);
-		argv = ft_split(cmd, ' ');
-		execve(ft_get_path(argv[0]), argv, environ);
-		perror(cmd);
-		exit(99);
-	}
-}
+// 	pid = fork();
+// 	if (pid == 0)
+// 	{
+// 		dup2(pipe[0], STDIN_FILENO);
+// 		close(pipe[0]);
+// 		dup2(pipe[1], STDOUT_FILENO);
+// 		close(pipe[1]);
+// 		argv = ft_split(cmd, ' ');
+// 		execve(ft_get_path(argv[0]), argv, environ);
+// 		perror(cmd);
+// 		exit(99);
+// 	}
+// }
 
-void	ft_last(char *outfile, char *cmd, int *pipe)
-{
-	char		**argv;
-	extern char	**environ;
-	pid_t		pid;
+// void	ft_last(char *outfile, char *cmd, int *pipe)
+// {
+// 	char		**argv;
+// 	extern char	**environ;
+// 	pid_t		pid;
 
-	pid = fork();
-	if (pid == 0)
-	{
-		close(pipe[1]);
-		dup2(pipe[0], STDIN_FILENO);
-		close(pipe[0]);
-		dup2(outfile, STDOUT_FILENO);
-		close(outfile);
-		argv = ft_split(cmd, ' ');
-		execve(ft_get_path(argv[0]), argv, environ);
-		perror(cmd);
-		exit(99);
-	}
-}
+// 	pid = fork();
+// 	if (pid == 0)
+// 	{
+// 		close(pipe[1]);
+// 		dup2(pipe[0], STDIN_FILENO);
+// 		close(pipe[0]);
+// 		dup2(outfile, STDOUT_FILENO);
+// 		close(outfile);
+// 		argv = ft_split(cmd, ' ');
+// 		execve(ft_get_path(argv[0]), argv, environ);
+// 		perror(cmd);
+// 		exit(99);
+// 	}
+// }
 
 
 int	main(int argc, char **argv)
 {
 	size_t	i;
+	size_t	n;
+	pid_t	pid;
 	int		pfd[2];
+	// char	**argv;
+	char	**environ;
+	int		prev_pipe;
+	char	*infile;
+	char	*outfile;
+	int		fd_in;
+	int		fd_out;
 
 	if (argc < 5)
 	{
@@ -183,19 +190,55 @@ int	main(int argc, char **argv)
 	}
 	else
 	{
-		while (1)
+		fd_in = open(argv[1], O_RDONLY);
+		dup2(fd_in, STDIN_FILENO);
+		close(fd_in);
+		n = 2;
+		prev_pipe = STDIN_FILENO;
+		while (n < argc - 2)
 		{
 			pipe(pfd);
-			// todo first round from infile
-			ft_first("infile", "cat", pfd);
-			// todo argv loop
-			// ft_middle("cat", pfd);
-			// todo last one outputting to outfile
-			ft_last("outfile", "wc", pipe);
-			// ft_pipex(argv[1], argv[2], argv[3], argv[4]);
-			wait(NULL);
-			wait(NULL);
-			wait(NULL);
+			pid = fork();
+			if (pid == 0)
+			{
+				if (prev_pipe != STDIN_FILENO)
+				{
+					dup2(prev_pipe, STDIN_FILENO);
+					close(prev_pipe);
+				}
+				dup2(pfd[WRITE], STDOUT_FILENO);
+				close(pfd[WRITE]);
+				argv = ft_split(argv[n], ' ');
+				execve(ft_get_path(argv[0]), argv, environ);
+				perror("execve failed");
+				exit(1);
+			}
+			// else if (pid > 0)
+			// {
+				close(prev_pipe);
+				close(pfd[WRITE]);
+				prev_pipe = pfd[READ];
+			// }
+			// else
+			// {
+			// 	// todo error handle
+			// }
+			n++;
+		}
+		if (prev_pipe != STDIN_FILENO)
+		{
+			dup2(prev_pipe, STDIN_FILENO);
+			close(prev_pipe);
+		}
+		fd_out = open(argv[argc - 1], O_WRONLY | O_CREAT, 0777);
+		dup2(fd_out, STDOUT_FILENO);
+		close(fd_out);
+		if (fork() == 0)
+		{
+			argv = ft_split(argv[argc - 2], ' ');
+			execve(ft_get_path(argv[0]), argv, environ);
+			perror("last execve fail");
+			exit(1);
 		}
 	}
 	return (0);
