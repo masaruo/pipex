@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/22 23:19:52 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/04/23 18:35:11 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ void	ft_input(char *cmd)
 	int	fd_input;
 
 	fd_input = open(cmd, O_RDONLY);
+	// todo open error - return 0?
 	dup2(fd_input, STDIN_FILENO);
 	close(fd_input);
 }
@@ -56,10 +57,17 @@ void	ft_loop_argv(char *cmd, int	*prev_pipe, int pfd[])
 		perror("execve failed");
 		exit(1);	
 	}
-	close(*prev_pipe);
-	close(pfd[WRITE]);
-	*prev_pipe = pfd[READ];
-	wait(NULL);
+	else if (pid > 0)
+	{
+		close(*prev_pipe);
+		close(pfd[WRITE]);
+		*prev_pipe = pfd[READ];
+		wait(NULL);
+	}
+	else
+	{
+	// todo fork error
+	}
 }
 
 void	ft_output(int *prev_pipe, char *cmd, char *outfile)
@@ -74,9 +82,10 @@ void	ft_output(int *prev_pipe, char *cmd, char *outfile)
 		close(*prev_pipe);
 	}
 	fd_output = open(outfile, O_WRONLY | O_CREAT, 0777);
+	// todo open error
 	dup2(fd_output, STDOUT_FILENO);
 	close(fd_output);
-	if (fork() == 0)
+	if (fork() == 0)//! fork error
 	{
 		argv = ft_split(cmd, ' ');
 		execve(ft_get_path(argv[0]), argv, environ);
