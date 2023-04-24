@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/23 18:35:11 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/04/24 14:27:58 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,9 +72,9 @@ void	ft_loop_argv(char *cmd, int	*prev_pipe, int pfd[])
 
 void	ft_output(int *prev_pipe, char *cmd, char *outfile)
 {
-	int		fd_output;
-	char	**argv;
-	char	**environ;
+	int			fd_output;
+	char		**argv;
+	extern char	**environ;
 
 	if (*prev_pipe != STDIN_FILENO)
 	{
