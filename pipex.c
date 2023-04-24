@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/24 18:18:27 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/04/24 20:33:01 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,10 +44,10 @@ static void	ft_input(char *infile, char *cmd, int pfd[])
 	if (fd_infile == -1)
 		ft_error(infile, true);
 	if (dup2(fd_infile, STDIN_FILENO) == -1)
-		ft_error("pipex", true);
+		ft_error(infile, true);
 	close(fd_infile);
 	if (dup2(pfd[WRITE], STDOUT_FILENO) == -1)
-		ft_error("pipex", true);
+		ft_error(infile, true);
 	close(pfd[WRITE]);
 	argv = ft_split(cmd, ' ');
 	execve(ft_get_path(argv[0]), argv, environ);

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   _pipex_bonus.c                                     :+:      :+:    :+:   */
+/*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/24 15:25:13 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/04/24 20:27:51 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,26 +26,35 @@ char	*ft_get_path(char *cmd)
 		return (ft_strjoin("/usr/bin/", cmd));
 }
 
-void	ft_input(char *cmd)
+static void	ft_error(char *msg, bool do_exit)
 {
-	int	fd_input;
-
-	fd_input = open(cmd, O_RDONLY);
-	// todo open error - return 0?
-	dup2(fd_input, STDIN_FILENO);
-	close(fd_input);
+	perror(msg);
+	if (do_exit == true)
+		exit(-1);
 }
 
-void	ft_loop_argv(char *cmd, int	*prev_pipe, int pfd[])
+void	ft_loop_argv(char *cmd, int	*prev_pipe, int pfd[], int n)
 {
 	char		**argv;
 	extern char	**environ;
 	pid_t		pid;
+	int			fd_input;
 
 	pid = fork();
 	if (pid == 0)
 	{
-		if (*prev_pipe != STDIN_FILENO)
+		if (n == 2)
+		{
+			fd_input = open(cmd, O_RDONLY);
+			if(fd_input == -1)
+				ft_error(cmd, true);
+			else
+			{
+				dup2(fd_input, STDIN_FILENO);
+				close(fd_input);
+			}
+		}
+		else if (*prev_pipe != STDIN_FILENO)
 		{
 			dup2(*prev_pipe, STDIN_FILENO);
 			close(*prev_pipe);
@@ -107,13 +116,12 @@ int	main(int argc, char **argv)
 	}
 	else
 	{
-		ft_input(argv[1]);
 		n = 2;
 		prev_pipe = STDIN_FILENO;
 		while (n < argc - 2)
 		{
 			pipe(pfd);
-			ft_loop_argv(argv[n], &prev_pipe, pfd);
+			ft_loop_argv(argv[n], &prev_pipe, pfd, n);
 			n++;
 		}
 		ft_output(&prev_pipe, argv[argc - 2], argv[argc - 1]);
