@@ -6,13 +6,14 @@
 #    By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/11 16:04:53 by mogawa            #+#    #+#              #
-#    Updated: 2023/04/25 20:13:21 by mogawa           ###   ########.fr        #
+#    Updated: 2023/04/25 23:03:59 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		=	pipex
 CC			=	cc
-CFLAGS		=	-Wall -Wextra -Werror
+# CFLAGS		=	-Wall -Wextra -Werror
+CFLAGS		=	-Wall
 RM			=	rm -f
 FILES		=	pipex
 BONUS_FILES	=	pipex_bonus get_next_line get_next_line_utils \

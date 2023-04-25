@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/25 20:02:53 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/04/25 23:21:18 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,44 +27,45 @@ static char	*ft_get_path(char *cmd)
 		return (ft_strjoin("/usr/bin/", cmd));
 }
 
-static void	ft_loop_argv(int fd, char *cmd, int prev, int pfd[])
+static void	ft_loop_argv(int fd, char *cmd, int *prev, int pfd[], int n)
 {
 	extern char	**environ;
-	// pid_t		pid;
+	pid_t		pid;
 
-	// pid = fork();
-	// if (pid == 0)
-	// {
-		close(pfd[READ]);
+	pid = fork();
+	if (pid == 0)
+	{
 		if (fd == -1)
-			ft_error("failed to open the file", true);
-		xdup2(fd, STDIN_FILENO);
-		if (prev != STDIN_FILENO)
-			xdup2(prev, STDIN_FILENO);
+			ft_error(cmd, true);
+		if (n == 2)
+			xdup2(fd, STDIN_FILENO);
+		else if (*prev != STDIN_FILENO)
+			xdup2(*prev, STDIN_FILENO);
 		xdup2(pfd[WRITE], STDOUT_FILENO);
 		execve(ft_get_path(ft_split(cmd, ' ')[0]), ft_split(cmd, ' '), environ);
 		ft_error(cmd, true);
-	// }
-	// else if (pid > 0)
-	// {
-	// 	close(*prev);
-	// 	close(pfd[WRITE]);
-	// 	*prev = pfd[READ];
-	// 	wait(NULL);
-	// }
-	// else
-	// 	ft_error(cmd, true);
+	}
+	else if (pid > 0)
+	{
+		close(*prev);
+		close(pfd[WRITE]);
+		*prev = dup(pfd[READ]);
+		close(pfd[READ]);
+		// wait(NULL);
+	}
+	else
+		ft_error(cmd, true);
 }
 
-static void	ft_outfile(int prev_pipe, char *cmd, char *outfile)
+static void	ft_outfile(int *prev_pipe, char *cmd, char *outfile)
 {
 	int			fd_output;
 	extern char	**environ;
 	char		**argv;
 	pid_t		pid;
 
-	if (prev_pipe != STDIN_FILENO)
-		xdup2(prev_pipe, STDIN_FILENO);
+	if (*prev_pipe != STDIN_FILENO)
+		xdup2(*prev_pipe, STDIN_FILENO);
 	fd_output = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (fd_output == -1)
 		ft_error(cmd, true);
@@ -111,7 +112,6 @@ int	main(int argc, char **argv)
 	int		pfd[2];
 	int		prev_pipe;
 	int		fd_input;
-	pid_t	pid;
 
 	if (argc < 5)
 		ft_error("invalid number of argvs", false);
@@ -126,25 +126,11 @@ int	main(int argc, char **argv)
 		while (n < argc - 2)
 		{
 			if (pipe(pfd) == -1)
-				ft_error(argv[n++], true);
-			pid = fork();
-			if (pid == 0)
-			{
-				ft_loop_argv(fd_input, argv[n], prev_pipe, pfd);
-			}
-			else if (pid > 0)
-			{
-				close(prev_pipe);
-				close(pfd[WRITE]);
-				prev_pipe = dup(pfd[READ]);
-				close(pfd[READ]);
-				wait(NULL);
-			}
-			else
-				ft_error("loop", true);
+				ft_error(argv[n], true);
+			ft_loop_argv(fd_input, argv[n], &prev_pipe, pfd, n);
 			n++;
 		}
-		ft_outfile(prev_pipe, argv[argc - 2], argv[argc - 1]);
+		ft_outfile(&prev_pipe, argv[argc - 2], argv[argc - 1]);
 		if (access("../tmpfile", F_OK) == 0)
 			unlink("tmpfile");
 	}
