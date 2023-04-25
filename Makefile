@@ -6,7 +6,7 @@
 #    By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/11 16:04:53 by mogawa            #+#    #+#              #
-#    Updated: 2023/04/25 17:27:45 by mogawa           ###   ########.fr        #
+#    Updated: 2023/04/25 20:13:21 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,6 +52,7 @@ all: $(NAME)
 
 clean:
 	$(RM) $(OBJS) $(OBJS_B)
+	$(RM) ./bonus_files/$(OBJS_B)
 	make -C ./libft clean
 
 fclean: clean
