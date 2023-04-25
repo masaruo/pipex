@@ -6,12 +6,13 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/24 23:45:46 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/04/25 15:59:46 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include "pipex_bonus.h"
+#include "get_next_line.h"
 
 static char	*ft_get_path(char *cmd)
 {
@@ -47,7 +48,7 @@ static int	xdup2(int oldfd, int newfd)
 	return (res);
 }
 
-static void	ft_loop_argv(int fd, char *cmd, int *prev, int pfd[], int n)
+static void	ft_loop_argv(int fd, char *cmd, int *prev, int pfd[])
 {
 	extern char	**environ;
 	pid_t		pid;
@@ -57,9 +58,8 @@ static void	ft_loop_argv(int fd, char *cmd, int *prev, int pfd[], int n)
 	{
 		if (fd == -1)
 			ft_error(cmd, true);
-		if (n == 2)
-			xdup2(fd, STDIN_FILENO);
-		else if (*prev != STDIN_FILENO)
+		xdup2(fd, STDIN_FILENO);
+		if (*prev != STDIN_FILENO)
 			xdup2(*prev, STDIN_FILENO);
 		xdup2(pfd[WRITE], STDOUT_FILENO);
 		execve(ft_get_path(ft_split(cmd, ' ')[0]), ft_split(cmd, ' '), environ);
@@ -70,12 +70,13 @@ static void	ft_loop_argv(int fd, char *cmd, int *prev, int pfd[], int n)
 		close(*prev);
 		close(pfd[WRITE]);
 		*prev = pfd[READ];
+		wait(NULL);
 	}
 	else
 		ft_error(cmd, true);
 }
 
-static void	ft_output(int *prev_pipe, char *cmd, char *outfile, bool is_hdoc)
+static void	ft_outfile(int *prev_pipe, char *cmd, char *outfile)
 {
 	int			fd_output;
 	extern char	**environ;
@@ -84,10 +85,7 @@ static void	ft_output(int *prev_pipe, char *cmd, char *outfile, bool is_hdoc)
 
 	if (*prev_pipe != STDIN_FILENO)
 		xdup2(*prev_pipe, STDIN_FILENO);
-	if (is_hdoc)
-		fd_output = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0777);
-	else
-		fd_output = open(outfile, O_WRONLY | O_CREAT | O_APPEND, 0777);
+	fd_output = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (fd_output == -1)
 		ft_error(cmd, true);
 	xdup2(fd_output, STDOUT_FILENO);
@@ -104,31 +102,56 @@ static void	ft_output(int *prev_pipe, char *cmd, char *outfile, bool is_hdoc)
 		ft_error(cmd, true);
 }
 
+int	ft_get_hdoc(char *end)
+{
+	int		fd;
+	char	*tmp;
+
+	fd = open("tmpfile", O_WRONLY | O_CREAT | O_TRUNC, 0777);
+	if (fd == -1)
+		ft_error("failed to create tempfile for here_doc", false);
+	while (1)
+	{
+		ft_putstr_fd("here_doc:", STDOUT_FILENO);
+		tmp = get_next_line(STDIN_FILENO);
+		if (ft_strcmp(end, ft_strtrim(tmp, "\n")) == 0)
+		{
+			free(tmp);
+			break ;
+		}
+		ft_putstr_fd(tmp, fd);
+		free(tmp);
+	}
+	return (open("tmpfile", O_RDONLY));
+}
+
 int	main(int argc, char **argv)
 {
 	int		n;
 	int		pfd[2];
 	int		prev_pipe;
 	int		fd_input;
-	bool	is_hdoc;
 
-	is_hdoc = false;
 	if (argc < 5)
 		ft_error("invalid number of argvs", false);
 	else
 	{
-		if (argv[1] == "here_doc")
-			is_hdoc = true;
 		n = 2;
+		if (ft_strcmp(argv[1], "here_doc") == 0)
+		{
+			fd_input = ft_get_hdoc(argv[2]);
+			n = 3;
+		}
+		else
+			fd_input = open(argv[1], O_RDONLY);
 		prev_pipe = STDIN_FILENO;
-		fd_input = open(argv[1], O_RDONLY);
 		while (n < argc - 2)
 		{
 			pipe(pfd);
-			ft_loop_argv(fd_input, argv[n], &prev_pipe, pfd, n);
+			ft_loop_argv(fd_input, argv[n], &prev_pipe, pfd);
 			n++;
 		}
-		ft_output(&prev_pipe, argv[argc - 2], argv[argc - 1], is_hdoc);
+		ft_outfile(&prev_pipe, argv[argc - 2], argv[argc - 1]);
 	}
 	return (0);
 }
