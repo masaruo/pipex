@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/24 23:29:57 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/04/25 18:05:33 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,16 +63,16 @@ static void	ft_output(char *outfile, char *cmd, int pfd[])
 	close(pfd[WRITE]);
 	fd_outfile = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (fd_outfile == -1)
-		ft_error(outfile, true);
+		ft_error(outfile, false);
 	if (dup2(pfd[READ], STDIN_FILENO) == -1)
-		ft_error(outfile, true);
+		ft_error(outfile, false);
 	close(pfd[READ]);
 	if (dup2(fd_outfile, STDOUT_FILENO) == -1)
-		ft_error(outfile, true);
+		ft_error(outfile, false);
 	close(fd_outfile);
 	argv = ft_split(cmd, ' ');
 	execve(ft_get_path(argv[0]), argv, environ);
-	ft_error(argv[0], true);
+	ft_error(argv[0], false);
 }
 
 int	main(int argc, char **argv)
@@ -92,11 +92,10 @@ int	main(int argc, char **argv)
 			else if (pid > 0)
 			{
 				ft_output(argv[4], argv[3], pfd);
+				wait(NULL);
 			}
 			else
 				ft_error("FORKING FAILED", false);
-			wait(NULL);
-			wait(NULL);
 		}
 		else
 			ft_error("PIPING FAILED", false);
