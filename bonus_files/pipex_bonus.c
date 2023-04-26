@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/26 17:10:27 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/04/26 17:42:36 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,24 @@
 
 static char	*ft_get_path(char *cmd)
 {
-	int		res;
-	char	*cmdpath;
+	int		res_bin;
+	int		res_usr;
+	char	*cmdpath_bin;
+	char	*cmdpath_usr;
 
-	cmdpath = ft_strjoin("/bin/", cmd);
-	res = access(cmdpath, F_OK);
-	if (res == 0)
-		return (cmdpath);
+	cmdpath_bin = ft_strjoin("/bin/", cmd);
+	res_bin = access(cmdpath_bin, F_OK);
+	cmdpath_usr = ft_strjoin("/usr/bin/", cmd);
+	res_usr = access(cmdpath_usr, F_OK);
+	if (res_usr == 0)
+		return (cmdpath_usr);
+	else if (res_bin == 0)
+		return (cmdpath_bin);
 	else
-		return (ft_strjoin("/usr/bin/", cmd));
+	{
+		ft_error("command not found", true);
+		return (cmd);
+	}
 }
 
 static void	ft_loop_argv(int fd, char *cmd, int *prev, int cnt)
