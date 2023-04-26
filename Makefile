@@ -6,14 +6,13 @@
 #    By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/11 16:04:53 by mogawa            #+#    #+#              #
-#    Updated: 2023/04/25 23:03:59 by mogawa           ###   ########.fr        #
+#    Updated: 2023/04/26 11:35:45 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		=	pipex
 CC			=	cc
-# CFLAGS		=	-Wall -Wextra -Werror
-CFLAGS		=	-Wall
+CFLAGS		=	-Wall -Wextra -Werror
 RM			=	rm -f
 FILES		=	pipex
 BONUS_FILES	=	pipex_bonus get_next_line get_next_line_utils \
@@ -43,12 +42,6 @@ $(NAME)_bonus: $(OBJS_B)
 
 bonus: $(NAME)_bonus
 
-debugbonus: fclean
-	make bonus WITH_DEBUG=1
-
-debug: fclean
-	make $(NAME) WITH_DEBUG=1
-
 all: $(NAME)
 
 clean:
@@ -63,4 +56,11 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: debug all clean fclean re debugbonus
+.PHONY: all clean fclean re
+
+# STORAGE
+# debugbonus: fclean
+# 	make bonus WITH_DEBUG=1
+# debug: fclean
+# 	make $(NAME) WITH_DEBUG=1
+#.PHONY: debug all clean fclean re debugbonus

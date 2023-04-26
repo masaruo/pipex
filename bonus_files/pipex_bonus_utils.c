@@ -6,13 +6,21 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/24 23:38:21 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/25 23:19:20 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/04/26 10:06:06 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include "pipex_bonus.h"
 #include "get_next_line.h"
+
+void	ft_parent_proc(int pfd[], int *prev)
+{
+	close(pfd[WRITE]);
+	close(*prev);
+	*prev = dup(pfd[READ]);
+	close(pfd[READ]);
+}
 
 void	ft_error(char *msg, bool to_exit)
 {
@@ -21,7 +29,7 @@ void	ft_error(char *msg, bool to_exit)
 		exit(-1);
 }
 
-int	xdup2(int oldfd, int newfd)
+int	xdup2(int oldfd, int newfd, bool to_kill)
 {
 	int	res;
 
@@ -30,7 +38,10 @@ int	xdup2(int oldfd, int newfd)
 	close(oldfd);
 	if (res == -1)
 	{
-		ft_error("PIPEX", true);
+		if (to_kill)
+			ft_error("PIPEX", true);
+		else
+			ft_error("PIPEX", false);
 	}
 	return (res);
 }
