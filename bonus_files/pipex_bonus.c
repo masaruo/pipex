@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/25 23:21:18 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/04/26 00:02:28 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,17 +27,21 @@ static char	*ft_get_path(char *cmd)
 		return (ft_strjoin("/usr/bin/", cmd));
 }
 
-static void	ft_loop_argv(int fd, char *cmd, int *prev, int pfd[], int n)
+static void	ft_loop_argv(int fd, char *cmd, int *prev, bool is_first)
 {
 	extern char	**environ;
+	int			pfd[2];
 	pid_t		pid;
 
+	if (pipe(pfd) == -1)
+		ft_error("pipe error", true);
 	pid = fork();
 	if (pid == 0)
 	{
+		close(pfd[READ]);
 		if (fd == -1)
 			ft_error(cmd, true);
-		if (n == 2)
+		if (is_first)
 			xdup2(fd, STDIN_FILENO);
 		else if (*prev != STDIN_FILENO)
 			xdup2(*prev, STDIN_FILENO);
@@ -47,8 +51,8 @@ static void	ft_loop_argv(int fd, char *cmd, int *prev, int pfd[], int n)
 	}
 	else if (pid > 0)
 	{
-		close(*prev);
 		close(pfd[WRITE]);
+		close(*prev);
 		*prev = dup(pfd[READ]);
 		close(pfd[READ]);
 		// wait(NULL);
@@ -109,9 +113,10 @@ static int	ft_get_hdoc(char *end)
 int	main(int argc, char **argv)
 {
 	int		n;
-	int		pfd[2];
+	bool	is_first;
 	int		prev_pipe;
 	int		fd_input;
+	
 
 	if (argc < 5)
 		ft_error("invalid number of argvs", false);
@@ -123,11 +128,11 @@ int	main(int argc, char **argv)
 		else
 			fd_input = open(argv[1], O_RDONLY);
 		prev_pipe = STDIN_FILENO;
+		is_first = true;
 		while (n < argc - 2)
 		{
-			if (pipe(pfd) == -1)
-				ft_error(argv[n], true);
-			ft_loop_argv(fd_input, argv[n], &prev_pipe, pfd, n);
+			ft_loop_argv(fd_input, argv[n], &prev_pipe, is_first);
+			is_first = false;
 			n++;
 		}
 		ft_outfile(&prev_pipe, argv[argc - 2], argv[argc - 1]);
