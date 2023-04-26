@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/26 17:03:41 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/04/26 17:10:27 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ static void	ft_loop_argv(int fd, char *cmd, int *prev, int cnt)
 		ft_error(cmd, true);
 }
 
-static void	ft_outfile(int *prev_pipe, char *cmd, char *outfile)
+static void	ft_outfile(int *prev_pipe, char *cmd, char *outfile, char *av1)
 {
 	int			fd_output;
 	extern char	**environ;
@@ -64,7 +64,10 @@ static void	ft_outfile(int *prev_pipe, char *cmd, char *outfile)
 
 	if (*prev_pipe != STDIN_FILENO)
 		xdup2(*prev_pipe, STDIN_FILENO, false);
-	fd_output = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+	if (ft_strcmp(av1, "here_doc") == 0)
+		fd_output = open(outfile, O_WRONLY | O_CREAT | O_APPEND, 0777);
+	else
+		fd_output = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (fd_output == -1)
 		ft_error(cmd, true);
 	xdup2(fd_output, STDOUT_FILENO, false);
@@ -124,7 +127,7 @@ int	main(int argc, char **argv)
 		cnt = 0;
 		while (n < argc - 2)
 			ft_loop_argv(fd_input, argv[n++], &prev_pipe, cnt++);
-		ft_outfile(&prev_pipe, argv[argc - 2], argv[argc - 1]);
+		ft_outfile(&prev_pipe, argv[argc - 2], argv[argc - 1], argv[1]);
 		while (cnt-- > 1)
 			wait(NULL);
 		if (access("tmpfile", F_OK) == 0)
