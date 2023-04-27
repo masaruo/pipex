@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/26 17:42:36 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/04/27 13:00:07 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ static void	ft_loop_argv(int fd, char *cmd, int *prev, int cnt)
 	else if (pid > 0)
 		ft_parent_proc(pfd, prev);
 	else
-		ft_error(cmd, true);
+		ft_error("fork", true);
 }
 
 static void	ft_outfile(int *prev_pipe, char *cmd, char *outfile, char *av1)
