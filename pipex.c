@@ -6,12 +6,19 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/26 17:43:32 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/04/29 16:08:23 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include "pipex.h"
+
+static void	ft_error(char *msg, bool do_exit)
+{
+	perror(msg);
+	if (do_exit == true)
+		exit(-1);
+}
 
 static char	*ft_get_path(char *cmd)
 {
@@ -33,13 +40,6 @@ static char	*ft_get_path(char *cmd)
 		ft_error("command not found", true);
 		return (cmd);
 	}
-}
-
-static void	ft_error(char *msg, bool do_exit)
-{
-	perror(msg);
-	if (do_exit == true)
-		exit(-1);
 }
 
 static void	ft_input(char *infile, char *cmd, int pfd[])
