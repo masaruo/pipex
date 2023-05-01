@@ -6,7 +6,7 @@
 #    By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/11 16:04:53 by mogawa            #+#    #+#              #
-#    Updated: 2023/05/01 20:20:13 by mogawa           ###   ########.fr        #
+#    Updated: 2023/05/01 20:48:36 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -54,14 +54,14 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+# .PHONY: all clean fclean re
 
 # STORAGE
-# ifdef WITH_DEBUG
-# CFLAGS += -g3 -O0 -fsanitize=address -fno-omit-frame-pointer
-# endif
-# debugbonus: fclean
-# 	make bonus WITH_DEBUG=1
-# debug: fclean
-# 	make $(NAME) WITH_DEBUG=1
-# .PHONY: debug all clean fclean re debugbonus
+ifdef WITH_DEBUG
+CFLAGS += -g3 -O0 -fsanitize=address -fno-omit-frame-pointer
+endif
+debugbonus: fclean
+	make bonus WITH_DEBUG=1
+debug: fclean
+	make $(NAME) WITH_DEBUG=1
+.PHONY: debug all clean fclean re debugbonus

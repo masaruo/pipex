@@ -6,25 +6,43 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/05/01 20:20:44 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/05/01 21:23:25 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include "pipex.h"
 
-char	*ft_get_env(char *cmd)
+char	*ft_get_path(char *cmd)
 {
 	extern char	**environ;
+	char		*envpath;
+	char		**env;
+	char		*cmdpath;
 	int			i;
-	char		**envitem;
 
+	if (cmd[0] == '/')
+		return (cmd);
 	i = 0;
 	while (environ[i])
 	{
-		dprintf(2, "no:%s & %d\n", environ[i], i);
+		envpath = environ[i];
+		if (ft_strncmp(environ[i], "PATH", 4) == 0)
+			break ;
 		i++;
 	}
+	env = ft_split(ft_strchr(envpath, '=') + 1, ':');
+	i = 0;
+	while (env[i])
+	{
+		cmd = ft_strjoin("/", cmd);
+		cmdpath = ft_strjoin(env[i], cmd);
+		if (access(cmdpath, X_OK) == 0)
+			break ;
+		i++;
+	}
+	free(env);
+	return (cmdpath);
 }
 
 static void	ft_error(char *msg, bool do_exit)
@@ -34,43 +52,31 @@ static void	ft_error(char *msg, bool do_exit)
 		exit(-1);
 }
 
-static char	*ft_get_path(char *cmd)
-{
-	int		res_bin;
-	int		res_usr;
-	char	*cmdpath;
-	char	*cmdpath_bin;
-	char	*cmdpath_usr;
-	extern char **environ;
-	//! ./cmd の対応
+// static char	*ft_get_path(char *cmd)
+// {
+// 	int		res_bin;
+// 	int		res_usr;
+// 	char	*cmdpath;
+// 	char	*cmdpath_bin;
+// 	char	*cmdpath_usr;
 
-	if (cmd[0] == '/')
-		cmdpath = cmd;
-	else
-	{
-		int i, j;
-		i = 0;
-		j = 0;
-		while (environ[i])
-		{
-			// dprintf(STDERR_FILENO, "%s\n", environ[i]);
-			i++;
-		}
-	}
-	cmdpath_bin = ft_strjoin("/bin/", cmd);
-	res_bin = access(cmdpath_bin, X_OK);
-	cmdpath_usr = ft_strjoin("/usr/bin/", cmd);
-	res_usr = access(cmdpath_usr, X_OK);
-	if (res_usr == 0)
-		return (cmdpath_usr);
-	else if (res_bin == 0)
-		return (cmdpath_bin);
-	else
-	{
-		ft_error("command not found", true);
-		return (cmd);
-	}
-}
+// 	if (cmd[0] == '/')
+// 		cmdpath = cmd;
+// 	ft_get_env(cmd);
+// 	cmdpath_bin = ft_strjoin("/bin/", cmd);
+// 	res_bin = access(cmdpath_bin, X_OK);
+// 	cmdpath_usr = ft_strjoin("/usr/bin/", cmd);
+// 	res_usr = access(cmdpath_usr, X_OK);
+// 	if (res_usr == 0)
+// 		return (cmdpath_usr);
+// 	else if (res_bin == 0)
+// 		return (cmdpath_bin);
+// 	else
+// 	{
+// 		ft_error("command not found", true);
+// 		return (cmd);
+// 	}
+// }
 
 static void	ft_input(char *infile, char *cmd, int pfd[])
 {
