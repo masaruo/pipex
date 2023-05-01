@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/29 16:08:23 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/05/01 20:16:28 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,9 +95,7 @@ int	main(int argc, char **argv)
 		{
 			pid = fork();
 			if (pid == 0)
-			{
 				ft_input(argv[1], argv[2], pfd);
-			}
 			else if (pid > 0)
 			{
 				ft_output(argv[4], argv[3], pfd);
@@ -109,5 +107,7 @@ int	main(int argc, char **argv)
 		else
 			ft_error("PIPING FAILED", false);
 	}
+	else
+		ft_error("Invalid number of arguments", true);
 	return (0);
 }
