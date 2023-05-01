@@ -6,7 +6,7 @@
 #    By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/11 16:04:53 by mogawa            #+#    #+#              #
-#    Updated: 2023/04/25 12:42:45 by mogawa           ###   ########.fr        #
+#    Updated: 2023/05/01 20:09:41 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ AR			=	ar rcs
 RM			=	rm -f
 FILES		=	ft_isalpha ft_isdigit ft_isalnum ft_isascii ft_isprint ft_strlen ft_memset \
 				ft_bzero ft_memcpy ft_memmove ft_strlcpy ft_toupper ft_tolower ft_strlcat \
-				ft_strchr ft_strrchr ft_strcmp ft_memchr ft_memcmp ft_atoi \
+				ft_strchr ft_strrchr ft_strncmp ft_memchr ft_memcmp ft_atoi \
 				ft_calloc ft_strdup \
 				ft_substr ft_strjoin ft_strtrim ft_split ft_itoa ft_strmapi ft_striteri \
 				ft_putchar_fd ft_putstr_fd ft_putendl_fd ft_putnbr_fd

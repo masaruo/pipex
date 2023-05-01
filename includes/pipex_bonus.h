@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:11 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/26 10:06:29 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/05/01 20:02:13 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@
 
 void	ft_error(char *msg, bool to_exit);
 int		xdup2(int oldfd, int newfd, bool to_kill);
-int		ft_strcmp(const char *s1, const char *s2);
 void	ft_parent_proc(int pfd[], int *prev);
 
 #endif

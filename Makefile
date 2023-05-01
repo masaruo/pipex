@@ -6,7 +6,7 @@
 #    By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/11 16:04:53 by mogawa            #+#    #+#              #
-#    Updated: 2023/04/29 16:10:13 by mogawa           ###   ########.fr        #
+#    Updated: 2023/05/01 20:03:53 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,11 +17,11 @@ RM			=	rm -f
 FILES		=	pipex
 BONUS_FILES	=	pipex_bonus get_next_line get_next_line_utils \
 				pipex_bonus_utils
-SRCS_DIR	=	./
-BONUS_DIR	=	./bonus_files/
+SRCS_DIR	=	./srcs/
+BONUS_DIR	=	./srcs/
 SRCS		=	$(addprefix $(SRCS_DIR), $(addsuffix .c, $(FILES)))
-SRCS_B		=	$(addprefix $(BONUS_DIR), $(addsuffix .c, $(BONUS_FILES)))
-INC			=	./headers/
+SRCS_B		=	$(addprefix $(SRCS_DIR), $(addsuffix .c, $(BONUS_FILES)))
+INC			=	./includes/
 OBJS		=	$(SRCS:.c=.o)
 OBJS_B		=	$(SRCS_B:.c=.o)
 
