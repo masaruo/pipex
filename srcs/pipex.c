@@ -6,12 +6,26 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/04/29 16:08:23 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/05/01 19:17:20 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include "pipex.h"
+
+char	*ft_get_env(char *cmd)
+{
+	extern char	**environ;
+	int			i;
+	char		**envitem;
+
+	i = 0;
+	while (environ[i])
+	{
+		dprintf(2, "no:%s & %d\n", environ[i], i);
+		i++;
+	}
+}
 
 static void	ft_error(char *msg, bool do_exit)
 {
@@ -24,13 +38,29 @@ static char	*ft_get_path(char *cmd)
 {
 	int		res_bin;
 	int		res_usr;
+	char	*cmdpath;
 	char	*cmdpath_bin;
 	char	*cmdpath_usr;
+	extern char **environ;
+	//! ./cmd の対応
 
+	if (cmd[0] == '/')
+		cmdpath = cmd;
+	else
+	{
+		int i, j;
+		i = 0;
+		j = 0;
+		while (environ[i])
+		{
+			// dprintf(STDERR_FILENO, "%s\n", environ[i]);
+			i++;
+		}
+	}
 	cmdpath_bin = ft_strjoin("/bin/", cmd);
-	res_bin = access(cmdpath_bin, F_OK);
+	res_bin = access(cmdpath_bin, X_OK);
 	cmdpath_usr = ft_strjoin("/usr/bin/", cmd);
-	res_usr = access(cmdpath_usr, F_OK);
+	res_usr = access(cmdpath_usr, X_OK);
 	if (res_usr == 0)
 		return (cmdpath_usr);
 	else if (res_bin == 0)
@@ -95,9 +125,7 @@ int	main(int argc, char **argv)
 		{
 			pid = fork();
 			if (pid == 0)
-			{
 				ft_input(argv[1], argv[2], pfd);
-			}
 			else if (pid > 0)
 			{
 				ft_output(argv[4], argv[3], pfd);
@@ -109,5 +137,7 @@ int	main(int argc, char **argv)
 		else
 			ft_error("PIPING FAILED", false);
 	}
+	else
+		ft_error("invalid number of argvs", false);
 	return (0);
 }
