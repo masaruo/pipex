@@ -6,7 +6,7 @@
 #    By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/11 16:04:53 by mogawa            #+#    #+#              #
-#    Updated: 2023/05/02 10:47:30 by mogawa           ###   ########.fr        #
+#    Updated: 2023/05/02 17:38:48 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,7 +36,8 @@ $(NAME): $(OBJS)
 
 $(NAME)_bonus: $(OBJS_B)
 	make -C ./libft
-	$(CC) $(CFLAGS) $(OBJS_B) ./libft/libft.a -o $(NAME)_bonus
+	$(CC) $(CFLAGS) $(OBJS_B) ./libft/libft.a -o $(NAME)
+# $(CC) $(CFLAGS) $(OBJS_B) ./libft/libft.a -o $(NAME)_bonus
 
 bonus: $(NAME)_bonus
 
@@ -44,12 +45,12 @@ all: $(NAME)
 
 clean:
 	$(RM) $(OBJS) $(OBJS_B)
-	$(RM) ./bonus_files/$(OBJS_B)
+#$(RM) ./bonus_files/$(OBJS_B)
 	make -C ./libft clean
 
 fclean: clean
 	$(RM) $(NAME)
-	$(RM) $(NAME)_bonus
+#$(RM) $(NAME)_bonus
 	make -C ./libft fclean
 
 re: fclean all

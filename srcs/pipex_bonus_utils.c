@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/24 23:38:21 by mogawa            #+#    #+#             */
-/*   Updated: 2023/05/02 16:49:13 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/05/02 19:02:31 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	ft_error(char *msg, bool to_exit)
 {
 	perror(msg);
 	if (to_exit)
-		exit(-1);
+		exit(1);
 }
 
 int	xdup2(int oldfd, int newfd, bool to_kill)

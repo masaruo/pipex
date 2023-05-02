@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/05/02 14:49:46 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/05/02 19:03:23 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ static void	ft_output(char *outfile, char *cmd, int pfd[])
 	close(pfd[WRITE]);
 	fd_outfile = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (fd_outfile == -1)
-		ft_error(outfile, false);
+		ft_error(outfile, true);
 	if (dup2(pfd[READ], STDIN_FILENO) == -1)
 		ft_error(outfile, false);
 	close(pfd[READ]);
@@ -115,13 +115,13 @@ int	main(int argc, char **argv)
 			else if (pid > 0)
 			{
 				ft_output(argv[4], argv[3], pfd);
-				wait(NULL);
 			}
 			else
 				ft_error("FORKING FAILED", false);
 		}
 		else
 			ft_error("PIPING FAILED", false);
+		wait(NULL);
 	}
 	else
 		ft_error("Invalid number of arguments", true);
