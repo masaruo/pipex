@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/05/02 15:04:54 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/05/02 16:23:45 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ static void	ft_outfile(int *prev_pipe, char *cmd, char *outfile, char *av1)
 	}
 	else if (pid > 0)
 		wait(NULL);
-	else
+	else if (pid < 0)
 		ft_error(cmd, false);
 }
 
@@ -137,10 +137,9 @@ int	main(int argc, char **argv)
 		while (n < argc - 2)
 			ft_loop_argv(fd_input, argv[n++], &prev_pipe, cnt++);
 		ft_outfile(&prev_pipe, argv[argc - 2], argv[argc - 1], argv[1]);
-		while (cnt-- > 1)
+		while (cnt-- > 0)
 			wait(NULL);
-		if (access("tmpfile", F_OK) == 0)
-			unlink("tmpfile");
+		unlink("tmpfile");
 	}
 	return (0);
 }
