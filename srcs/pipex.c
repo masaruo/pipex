@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/05/02 13:53:56 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/05/02 14:49:46 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,16 +34,16 @@ static char	**ft_get_env(void)
 
 static char	*ft_get_path(char *cmd)
 {
-	extern char	**environ;
 	char		**env;
 	char		*cmdpath;
 	int			i;
 
-	if (cmd[0] == '/' || cmd[0] == '.' || !cmd || !*cmd)
-	{
-		ft_error("command error", false);
-		return ("dakjflsdjfladsjfl;asjdflkasdjflk;asj");
-	}
+	if (!cmd || !*cmd)
+		ft_error("empty command", true);
+	if (cmd[0] == '.')
+		ft_error("command error", true);
+	if (cmd[0] == '/')
+		return (cmd);
 	env = ft_get_env();
 	i = 0;
 	while (env[i])

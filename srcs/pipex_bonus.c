@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/05/02 09:26:41 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/05/02 15:04:54 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,26 +14,49 @@
 #include "pipex_bonus.h"
 #include "get_next_line.h"
 
+static char	**ft_get_env(void)
+{
+	extern char	**environ;
+	char		*envpath;
+	char		**env;
+	int			i;
+
+	i = 0;
+	while (environ[i])
+	{
+		envpath = environ[i];
+		if (ft_strncmp(environ[i], "PATH", 4) == 0)
+			break ;
+		i++;
+	}
+	env = ft_split(ft_strchr(envpath, '=') + 1, ':');
+	return (env);
+}
+
 static char	*ft_get_path(char *cmd)
 {
-	int		res_bin;
-	int		res_usr;
-	char	*cmdpath_bin;
-	char	*cmdpath_usr;
+	char		**env;
+	char		*cmdpath;
+	int			i;
 
-	cmdpath_bin = ft_strjoin("/bin/", cmd);
-	res_bin = access(cmdpath_bin, F_OK);
-	cmdpath_usr = ft_strjoin("/usr/bin/", cmd);
-	res_usr = access(cmdpath_usr, F_OK);
-	if (res_usr == 0)
-		return (cmdpath_usr);
-	else if (res_bin == 0)
-		return (cmdpath_bin);
-	else
-	{
-		ft_error("command not found", true);
+	if (!cmd || !*cmd)
+		ft_error("empty command", true);
+	if (cmd[0] == '.')
+		ft_error("command error", true);
+	if (cmd[0] == '/')
 		return (cmd);
+	env = ft_get_env();
+	i = 0;
+	while (env[i])
+	{
+		cmd = ft_strjoin("/", cmd);
+		cmdpath = ft_strjoin(env[i], cmd);
+		if (access(cmdpath, X_OK) == 0)
+			break ;
+		i++;
 	}
+	free(env);
+	return (cmdpath);
 }
 
 static void	ft_loop_argv(int fd, char *cmd, int *prev, int cnt)
@@ -73,7 +96,6 @@ static void	ft_outfile(int *prev_pipe, char *cmd, char *outfile, char *av1)
 
 	if (*prev_pipe != STDIN_FILENO)
 		xdup2(*prev_pipe, STDIN_FILENO, false);
-	// if (ft_strncmp(av1, "here_doc", ft_strlen("here_doc")) == 0)
 	if (ft_strncmp(av1, "here_doc", ft_strlen("here_doc")) == 0)
 		fd_output = open(outfile, O_WRONLY | O_CREAT | O_APPEND, 0777);
 	else
@@ -94,29 +116,6 @@ static void	ft_outfile(int *prev_pipe, char *cmd, char *outfile, char *av1)
 		ft_error(cmd, false);
 }
 
-static int	ft_get_hdoc(char *end)
-{
-	int		fd;
-	char	*tmp;
-
-	fd = open("tmpfile", O_WRONLY | O_CREAT | O_TRUNC, 0777);
-	if (fd == -1)
-		ft_error("failed to create tempfile for here_doc", false);
-	while (1)
-	{
-		ft_putstr_fd("here_doc:", STDOUT_FILENO);
-		tmp = get_next_line(STDIN_FILENO);
-		if (ft_strncmp(end, ft_strtrim(tmp, "\n"), ft_strlen(end)) == 0)
-		{
-			free(tmp);
-			break ;
-		}
-		ft_putstr_fd(tmp, fd);
-		free(tmp);
-	}
-	return (open("tmpfile", O_RDONLY));
-}
-
 int	main(int argc, char **argv)
 {
 	int		n;
@@ -129,7 +128,6 @@ int	main(int argc, char **argv)
 	else
 	{
 		n = 2;
-		// if (ft_strncmp(argv[1], "here_doc", ft_strlen("here_doc")) == 0)
 		if (ft_strncmp(argv[1], "here_doc", ft_strlen("here_doc")) == 0)
 			fd_input = ft_get_hdoc(argv[n++]);
 		else
