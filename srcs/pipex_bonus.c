@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/05/01 20:04:46 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/05/02 09:26:41 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ static void	ft_outfile(int *prev_pipe, char *cmd, char *outfile, char *av1)
 
 	if (*prev_pipe != STDIN_FILENO)
 		xdup2(*prev_pipe, STDIN_FILENO, false);
+	// if (ft_strncmp(av1, "here_doc", ft_strlen("here_doc")) == 0)
 	if (ft_strncmp(av1, "here_doc", ft_strlen("here_doc")) == 0)
 		fd_output = open(outfile, O_WRONLY | O_CREAT | O_APPEND, 0777);
 	else
@@ -128,6 +129,7 @@ int	main(int argc, char **argv)
 	else
 	{
 		n = 2;
+		// if (ft_strncmp(argv[1], "here_doc", ft_strlen("here_doc")) == 0)
 		if (ft_strncmp(argv[1], "here_doc", ft_strlen("here_doc")) == 0)
 			fd_input = ft_get_hdoc(argv[n++]);
 		else

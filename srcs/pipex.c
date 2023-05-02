@@ -6,23 +6,20 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/05/01 21:23:25 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/05/02 13:53:56 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include "pipex.h"
 
-char	*ft_get_path(char *cmd)
+static char	**ft_get_env(void)
 {
 	extern char	**environ;
 	char		*envpath;
 	char		**env;
-	char		*cmdpath;
 	int			i;
 
-	if (cmd[0] == '/')
-		return (cmd);
 	i = 0;
 	while (environ[i])
 	{
@@ -32,6 +29,22 @@ char	*ft_get_path(char *cmd)
 		i++;
 	}
 	env = ft_split(ft_strchr(envpath, '=') + 1, ':');
+	return (env);
+}
+
+static char	*ft_get_path(char *cmd)
+{
+	extern char	**environ;
+	char		**env;
+	char		*cmdpath;
+	int			i;
+
+	if (cmd[0] == '/' || cmd[0] == '.' || !cmd || !*cmd)
+	{
+		ft_error("command error", false);
+		return ("dakjflsdjfladsjfl;asjdflkasdjflk;asj");
+	}
+	env = ft_get_env();
 	i = 0;
 	while (env[i])
 	{
@@ -44,39 +57,6 @@ char	*ft_get_path(char *cmd)
 	free(env);
 	return (cmdpath);
 }
-
-static void	ft_error(char *msg, bool do_exit)
-{
-	perror(msg);
-	if (do_exit == true)
-		exit(-1);
-}
-
-// static char	*ft_get_path(char *cmd)
-// {
-// 	int		res_bin;
-// 	int		res_usr;
-// 	char	*cmdpath;
-// 	char	*cmdpath_bin;
-// 	char	*cmdpath_usr;
-
-// 	if (cmd[0] == '/')
-// 		cmdpath = cmd;
-// 	ft_get_env(cmd);
-// 	cmdpath_bin = ft_strjoin("/bin/", cmd);
-// 	res_bin = access(cmdpath_bin, X_OK);
-// 	cmdpath_usr = ft_strjoin("/usr/bin/", cmd);
-// 	res_usr = access(cmdpath_usr, X_OK);
-// 	if (res_usr == 0)
-// 		return (cmdpath_usr);
-// 	else if (res_bin == 0)
-// 		return (cmdpath_bin);
-// 	else
-// 	{
-// 		ft_error("command not found", true);
-// 		return (cmd);
-// 	}
-// }
 
 static void	ft_input(char *infile, char *cmd, int pfd[])
 {

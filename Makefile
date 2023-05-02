@@ -6,7 +6,7 @@
 #    By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/11 16:04:53 by mogawa            #+#    #+#              #
-#    Updated: 2023/05/01 20:48:36 by mogawa           ###   ########.fr        #
+#    Updated: 2023/05/02 10:47:30 by mogawa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@ CC			=	cc
 CFLAGS		=	-Wall
 # CFLAGS		=	-Wall -Wextra -Werror
 RM			=	rm -f
-FILES		=	pipex get_next_line get_next_line_utils
+FILES		=	pipex pipex_utils
 BONUS_FILES	=	pipex_bonus get_next_line get_next_line_utils \
 				pipex_bonus_utils
 SRCS_DIR	=	./srcs/
