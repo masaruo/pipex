@@ -6,7 +6,7 @@
 /*   By: mogawa <mogawa@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 17:24:05 by mogawa            #+#    #+#             */
-/*   Updated: 2023/05/03 07:57:03 by mogawa           ###   ########.fr       */
+/*   Updated: 2023/05/04 17:25:44 by mogawa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ static void	ft_outfile(int *prev_pipe, char *cmd, char *outfile, char *av1)
 
 	if (*prev_pipe != STDIN_FILENO)
 		xdup2(*prev_pipe, STDIN_FILENO, false);
-	if (ft_strncmp(av1, "here_doc", ft_strlen("here_doc")) == 0)
+	if (ft_strncmp(av1, "here_doc", ft_strlen("here_doc") + 1) == 0)
 		fd_output = open(outfile, O_WRONLY | O_CREAT | O_APPEND, 0777);
 	else
 		fd_output = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0777);
@@ -108,8 +108,9 @@ static void	ft_outfile(int *prev_pipe, char *cmd, char *outfile, char *av1)
 		execve(ft_get_path(argv[0]), argv, environ);
 		ft_error(cmd, true);
 	}
-	else if (pid > 0)
-		wait(NULL);
+	// else if (pid > 0)
+	// 	printf("parent outfile process|n");
+		// wait(NULL);
 	else if (pid < 0)
 		ft_error(cmd, false);
 }
@@ -120,13 +121,15 @@ int	main(int argc, char **argv)
 	int		prev_pipe;
 	int		fd_input;
 	int		cnt;
+	pid_t	wpid;
+	int		status;
 
 	if (argc < 5)
 		ft_error("invalid number of argvs", false);
 	else
 	{
 		n = 2;
-		if (ft_strncmp(argv[1], "here_doc", ft_strlen("here_doc")) == 0)
+		if (ft_strncmp(argv[1], "here_doc", ft_strlen("here_doc") + 1) == 0)
 			fd_input = ft_get_hdoc(argv[n++]);
 		else
 			fd_input = open(argv[1], O_RDONLY);
@@ -135,8 +138,10 @@ int	main(int argc, char **argv)
 		while (n < argc - 2)
 			ft_loop_argv(fd_input, argv[n++], &prev_pipe, cnt++);
 		ft_outfile(&prev_pipe, argv[argc - 2], argv[argc - 1], argv[1]);
-		while (cnt-- > 0)
-			wait(NULL);
+		// while (cnt-- > 0)
+		// 	wait(NULL);
+		while ((wpid = wait(&status)) > 0)
+			dprintf(1, "exit status of %d was %d\n", (int)wpid, status);
 		unlink("tmpfile");
 	}
 	return (0);
